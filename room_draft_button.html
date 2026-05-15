@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>楽天ROOM 投稿候補ワンクリック作成</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fff7f4;
+      --card: #ffffff;
+      --accent: #bf0000;
+      --accent-dark: #8f0000;
+      --text: #222222;
+      --muted: #666666;
+      --line: #ead8d4;
+      --ok: #087f5b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #fff7f4 0%, #fff 58%, #fff0eb 100%);
+      color: var(--text);
+    }
+    main {
+      width: min(980px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(191, 0, 0, 0.10);
+      padding: clamp(24px, 5vw, 48px);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 48px);
+      line-height: 1.1;
+    }
+    .lead {
+      margin: 0 auto 24px;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+    .notice {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #fff0eb;
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      max-width: 680px;
+      margin: 0 auto 16px;
+    }
+    input {
+      width: 100%;
+      padding: 16px 18px;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      font-size: 18px;
+    }
+    button, .download {
+      border: 0;
+      border-radius: 16px;
+      background: var(--accent);
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 800;
+      padding: 16px 22px;
+      text-decoration: none;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    button:hover, .download:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .preset {
+      background: #ffffff;
+      color: var(--accent-dark);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 14px;
+      padding: 9px 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .card, .checklist {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 12px 32px rgba(40, 20, 20, 0.06);
+    }
+    .card h2 { margin: 0 0 12px; font-size: 20px; }
+    .meta { color: var(--muted); line-height: 1.7; margin: 0 0 12px; }
+    .comment {
+      background: #fffaf8;
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      line-height: 1.8;
+      margin: 12px 0;
+      padding: 12px;
+    }
+    .risk-ok { color: var(--ok); font-weight: 800; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 18px;
+    }
+    .secondary { background: #444; }
+    .secondary:hover { background: #222; }
+    .checklist { margin-top: 18px; }
+    .checklist h2 { margin-top: 0; }
+    .checklist li { margin: 8px 0; }
+    .hidden { display: none; }
+    @media (max-width: 640px) {
+      .controls { grid-template-columns: 1fr; }
+      button, .download { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="notice">APIキー不要・自動投稿なし</div>
+      <h1>楽天ROOM 投稿候補を<br>ボタンひとつで作成</h1>
+      <p class="lead">
+        商品ジャンルを入力して「投稿候補を作成」を押すだけで、ROOM向けコメント案と確認チェックリストを作ります。
+        楽天ROOMへの投稿は、内容を確認してから手動で行ってください。
+      </p>
+      <div class="controls">
+        <input id="keyword" value="コーヒー" aria-label="商品ジャンル" placeholder="例: コーヒー、収納ボックス、母の日 ギフト">
+        <button id="generate" type="button">投稿候補を作成</button>
+      </div>
+      <div class="preset-row" aria-label="おすすめジャンル">
+        <button class="preset" type="button" data-keyword="コーヒー">コーヒー</button>
+        <button class="preset" type="button" data-keyword="収納ボックス">収納ボックス</button>
+        <button class="preset" type="button" data-keyword="母の日 ギフト">母の日 ギフト</button>
+        <button class="preset" type="button" data-keyword="水筒">水筒</button>
+      </div>
+    </section>
+
+    <section id="result" class="hidden" aria-live="polite">
+      <div class="actions">
+        <button id="copy" class="secondary" type="button">コメント案をコピー</button>
+        <a id="downloadCsv" class="download" href="#" download="room_drafts.csv">CSVをダウンロード</a>
+      </div>
+      <div class="checklist">
+        <h2>投稿前チェック</h2>
+        <ul>
+          <li>商品ページで価格・在庫・配送条件を確認する</li>
+          <li>紹介文が商品実態と一致しているか確認する</li>
+          <li>効果効能・No.1・最安値などの断定表現を入れない</li>
+          <li>外部リンクや無許可画像を追加しない</li>
+          <li>同一文面の大量投稿や連投を避ける</li>
+        </ul>
+      </div>
+      <div id="cards" class="grid"></div>
+    </section>
+  </main>
+
+  <script>
+    const templates = [
+      {
+        suffix: 'お試しセット',
+        price: '1,980円',
+        shop: 'サンプルショップ',
+        review: '平均4.5 / 128件',
+        hint: '毎日の暮らしで使いやすいセット商品です。'
+      },
+      {
+        suffix: 'ギフトボックス',
+        price: '3,480円',
+        shop: 'ギフト専門店',
+        review: '平均4.7 / 64件',
+        hint: '贈り物向けのパッケージで、季節のギフトにも選ばれています。'
+      },
+      {
+        suffix: '大容量タイプ',
+        price: '4,980円',
+        shop: 'まとめ買いストア',
+        review: '平均4.2 / 210件',
+        hint: 'ストックしやすい大容量タイプです。'
+      }
+    ];
+
+    function buildItems(keyword) {
+      return templates.map((template, index) => {
+        const name = `${keyword} ${template.suffix}`;
+        return {
+          name,
+          price: template.price,
+          shop: template.shop,
+          review: template.review,
+          url: `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword)}/`,
+          comment: `気になったのは「${name}」。 ${template.hint} ${template.review}の実績も参考になります。 商品ページでサイズ・内容量・配送条件を確認してから選ぶのがおすすめです。`,
+          risk: '簡易チェックOK',
+          index: index + 1
+        };
+      });
+    }
+
+    function csvEscape(value) {
+      return `"${String(value).replaceAll('"', '""')}"`;
+    }
+
+    function makeCsv(items) {
+      const rows = [
+        ['item_name', 'shop_name', 'price', 'review', 'url', 'room_comment', 'risk_terms', 'manual_review_done'],
+        ...items.map(item => [item.name, item.shop, item.price, item.review, item.url, item.comment, '', 'FALSE'])
+      ];
+      return rows.map(row => row.map(csvEscape).join(',')).join('\n');
+    }
+
+    function render() {
+      const keyword = document.getElementById('keyword').value.trim() || 'コーヒー';
+      const items = buildItems(keyword);
+      const cards = document.getElementById('cards');
+      cards.innerHTML = items.map(item => `
+        <article class="card">
+          <h2>${item.index}. ${item.name}</h2>
+          <p class="meta">
+            ショップ: ${item.shop}<br>
+            価格: ${item.price}<br>
+            レビュー: ${item.review}<br>
+            商品検索: <a href="${item.url}" target="_blank" rel="noopener">楽天市場で確認</a>
+          </p>
+          <p class="risk-ok">リスク表現: ${item.risk}</p>
+          <div class="comment">${item.comment}</div>
+        </article>
+      `).join('');
+
+      const csv = makeCsv(items);
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const download = document.getElementById('downloadCsv');
+      download.href = url;
+      download.download = `room_drafts_${keyword.replaceAll(/\s+/g, '_')}.csv`;
+      document.getElementById('result').classList.remove('hidden');
+    }
+
+    document.getElementById('generate').addEventListener('click', render);
+    document.getElementById('copy').addEventListener('click', async () => {
+      const comments = [...document.querySelectorAll('.comment')].map(node => node.textContent).join('\n\n');
+      await navigator.clipboard.writeText(comments);
+      document.getElementById('copy').textContent = 'コピーしました';
+      setTimeout(() => { document.getElementById('copy').textContent = 'コメント案をコピー'; }, 1400);
+    });
+    document.querySelectorAll('.preset').forEach(button => {
+      button.addEventListener('click', () => {
+        document.getElementById('keyword').value = button.dataset.keyword;
+        render();
+      });
+    });
+  </script>
+</body>
+</html>
