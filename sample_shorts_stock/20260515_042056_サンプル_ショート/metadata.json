@@ -1,0 +1,10 @@
+{
+  "theme": "サンプル ショート｜今日から使えるショート",
+  "created_at": "2026-05-15T04:20:56",
+  "video": "sample_shorts_stock/20260515_042056_サンプル_ショート/short_video.mp4",
+  "title_file": "sample_shorts_stock/20260515_042056_サンプル_ショート/title.txt",
+  "description_file": "sample_shorts_stock/20260515_042056_サンプル_ショート/description.txt",
+  "script_file": "sample_shorts_stock/20260515_042056_サンプル_ショート/script.txt",
+  "status": "draft",
+  "posting": "manual_or_official_api_only"
+}
